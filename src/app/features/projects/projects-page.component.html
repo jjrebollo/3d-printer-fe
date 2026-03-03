@@ -1,0 +1,29 @@
+<div class="page">
+  <div class="page-header">
+    <span class="page-label">Portfolio</span>
+    <h1>Projects</h1>
+    <p class="page-description">A showcase of completed 3D printing creations.</p>
+  </div>
+
+  <app-loading-spinner *ngIf="loading" />
+
+  <div class="error-msg" *ngIf="error">{{ error }}</div>
+
+  <div class="empty-msg" *ngIf="!loading && !error && projects.length === 0">
+    No projects yet. Check back soon!
+  </div>
+
+  <div class="projects-grid" *ngIf="projects.length > 0">
+    <app-project-card
+      *ngFor="let project of projects"
+      [project]="project"
+      (selected)="openModal($event)"
+    />
+  </div>
+</div>
+
+<app-project-detail-modal
+  *ngIf="selectedProject"
+  [project]="selectedProject"
+  (closed)="closeModal()"
+/>

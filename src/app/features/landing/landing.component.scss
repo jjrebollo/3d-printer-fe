@@ -1,0 +1,209 @@
+// ── Hero ────────────────────────────────────────────────────────────────────
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 212, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.25;
+
+  &-1 {
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, #00d4ff, transparent 70%);
+    top: -200px;
+    right: -100px;
+  }
+
+  &-2 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, #ff6b35, transparent 70%);
+    bottom: -150px;
+    left: -100px;
+  }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 780px;
+  padding: 0 2rem;
+  padding-top: 5rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 100px;
+  color: #00d4ff;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+h1 {
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: #e0e8f0;
+  margin: 0 0 1.5rem;
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #00d4ff, #ff6b35);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  font-size: 1.15rem;
+  color: #7a8fa8;
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+}
+
+.cta-group {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.85rem 2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &-primary {
+    background: #00d4ff;
+    color: #0a0e1a;
+    box-shadow: 0 0 24px rgba(0, 212, 255, 0.3);
+
+    &:hover {
+      box-shadow: 0 0 36px rgba(0, 212, 255, 0.5);
+    }
+  }
+
+  &-outline {
+    border: 1.5px solid rgba(0, 212, 255, 0.4);
+    color: #c0c8d8;
+
+    &:hover {
+      border-color: #00d4ff;
+      color: #00d4ff;
+    }
+  }
+}
+
+.scroll-hint {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: #4a5a70;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  z-index: 1;
+
+  .scroll-arrow {
+    width: 20px;
+    height: 20px;
+    border-right: 2px solid #4a5a70;
+    border-bottom: 2px solid #4a5a70;
+    transform: rotate(45deg);
+    animation: bounce 1.5s ease infinite;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: rotate(45deg) translateY(0); }
+  50% { transform: rotate(45deg) translateY(5px); }
+}
+
+// ── Features ────────────────────────────────────────────────────────────────
+.features {
+  padding: 6rem 2rem;
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.feature-card {
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  transition: border-color 0.2s, transform 0.2s;
+
+  &:hover {
+    border-color: rgba(0, 212, 255, 0.25);
+    transform: translateY(-4px);
+  }
+
+  .feature-icon {
+    font-size: 2rem;
+    color: #00d4ff;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+    color: #e0e8f0;
+    margin: 0 0 0.75rem;
+    font-weight: 600;
+  }
+
+  p {
+    font-size: 0.9rem;
+    color: #5a6e88;
+    line-height: 1.6;
+    margin: 0;
+  }
+}

@@ -1,0 +1,15 @@
+<div class="page">
+  <div class="page-header">
+    <span class="page-label">The Creator</span>
+    <h1>Who Am I</h1>
+    <p class="page-description">The person behind the prints.</p>
+  </div>
+
+  <div class="page-body">
+    <app-loading-spinner *ngIf="loading" />
+
+    <div class="error-msg" *ngIf="error">{{ error }}</div>
+
+    <app-owner-profile *ngIf="owner" [owner]="owner" />
+  </div>
+</div>

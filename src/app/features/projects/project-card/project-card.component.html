@@ -1,0 +1,14 @@
+<div class="card" (click)="selected.emit(project)" role="button" tabindex="0"
+     (keyup.enter)="selected.emit(project)" (keyup.space)="selected.emit(project)">
+  <div class="card-image">
+    <img [src]="project.imageUrl" [alt]="project.title" loading="lazy"
+         (error)="onImgError($event)" />
+    <div class="card-overlay"></div>
+  </div>
+
+  <div class="card-body">
+    <h3 class="card-title">{{ project.title }}</h3>
+    <p class="card-desc" *ngIf="project.description">{{ project.description }}</p>
+    <div class="card-date">{{ project.createdAt | date: 'MMM d, y' }}</div>
+  </div>
+</div>

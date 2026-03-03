@@ -1,0 +1,34 @@
+<div class="profile-card">
+  <div class="avatar">
+    <img
+      *ngIf="owner.pictureUrl"
+      [src]="owner.pictureUrl"
+      [alt]="owner.name"
+      class="avatar-img"
+    />
+    <span *ngIf="!owner.pictureUrl">{{ owner.name.charAt(0) }}</span>
+  </div>
+
+  <div class="profile-info">
+    <h2 class="profile-name">{{ owner.name }}</h2>
+
+    <div class="profile-meta">
+      <div class="meta-item">
+        <span class="meta-icon">📍</span>
+        <span>{{ owner.city }}</span>
+      </div>
+      <div class="meta-item" *ngIf="owner.instagramProfileLink">
+        <span class="meta-icon">📸</span>
+        <a [href]="owner.instagramProfileLink" target="_blank" rel="noopener">
+          Instagram
+        </a>
+      </div>
+    </div>
+
+    <p class="profile-bio">
+      Passionate about making — turning digital designs into physical objects one
+      layer at a time. Based in {{ owner.city }}, crafting bespoke 3D printed
+      objects for enthusiasts and professionals alike.
+    </p>
+  </div>
+</div>

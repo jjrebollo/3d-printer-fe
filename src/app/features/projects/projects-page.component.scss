@@ -1,0 +1,58 @@
+.page {
+  min-height: 100vh;
+  padding: 8rem 2rem 4rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.page-label {
+  display: inline-block;
+  padding: 0.3rem 0.9rem;
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 100px;
+  color: #00d4ff;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  color: #e0e8f0;
+  margin: 0 0 0.75rem;
+}
+
+.page-description {
+  color: #5a6e88;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.error-msg,
+.empty-msg {
+  text-align: center;
+  padding: 4rem 2rem;
+  font-size: 0.95rem;
+}
+
+.error-msg {
+  color: #ff6b6b;
+}
+
+.empty-msg {
+  color: #5a6e88;
+}

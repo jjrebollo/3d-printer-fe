@@ -1,0 +1,28 @@
+<div class="backdrop" (click)="onBackdropClick($event)">
+  <div class="modal" role="dialog" [attr.aria-label]="project.title">
+
+    <button class="close-btn" (click)="closed.emit()" aria-label="Close">✕</button>
+
+    <div class="modal-image">
+      <img
+        [src]="project.imageUrl"
+        [alt]="project.title"
+        (error)="onImgError($event)"
+      />
+    </div>
+
+    <div class="modal-body">
+      <div class="modal-meta">
+        <span class="modal-date">{{ project.createdAt | date: 'MMMM d, y' }}</span>
+        <span class="modal-owner" *ngIf="project.owner">by {{ project.owner.name }}</span>
+      </div>
+
+      <h2 class="modal-title">{{ project.title }}</h2>
+
+      <p class="modal-description" *ngIf="project.description">
+        {{ project.description }}
+      </p>
+    </div>
+
+  </div>
+</div>

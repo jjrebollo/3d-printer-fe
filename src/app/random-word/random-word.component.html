@@ -1,0 +1,5 @@
+<button (click)="fetchRandomWord()" [disabled]="loading">
+  {{ loading ? 'Loading...' : 'Get Random Word' }}
+</button>
+
+<p *ngIf="word" class="word">{{ word }}</p>
