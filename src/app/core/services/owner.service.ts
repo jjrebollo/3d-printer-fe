@@ -6,7 +6,7 @@ import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class OwnerService {
-  private readonly baseUrl = `${environment.apiBaseUrl}/owners`;
+  private readonly baseUrl = `${environment.apiBaseUrl}/api/owners`;
 
   constructor(private http: HttpClient) {}
 
