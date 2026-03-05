@@ -1,10 +1,16 @@
-<nav class="navbar">
+<nav class="navbar" [class.menu-open]="menuOpen">
   <a class="brand" routerLink="/">
     <span class="brand-icon">▲</span>
     <span class="brand-text">Print<strong>Lab</strong></span>
   </a>
 
-  <ul class="nav-links">
+  <button class="hamburger" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen" aria-label="Toggle menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <ul class="nav-links" [class.open]="menuOpen">
     <li>
       <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
     </li>
@@ -16,3 +22,5 @@
     </li>
   </ul>
 </nav>
+
+<div class="nav-backdrop" *ngIf="menuOpen" (click)="toggleMenu()"></div>

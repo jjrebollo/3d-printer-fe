@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/3dprinter/(.*)", "destination": "/index.html" }
+  ]
+}

@@ -5,6 +5,10 @@
   padding: 8rem 2rem 4rem;
   max-width: 800px;
   margin: 0 auto;
+
+  @media (max-width: 640px) {
+    padding: 6rem 1rem 3rem;
+  }
 }
 
 .page-header {

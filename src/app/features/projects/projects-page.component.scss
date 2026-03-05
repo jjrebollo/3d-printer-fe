@@ -3,6 +3,10 @@
   padding: 8rem 2rem 4rem;
   max-width: 1200px;
   margin: 0 auto;
+
+  @media (max-width: 640px) {
+    padding: 6rem 1rem 3rem;
+  }
 }
 
 .page-header {
@@ -38,8 +42,12 @@ h1 {
 
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
   gap: 1.5rem;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .error-msg,
