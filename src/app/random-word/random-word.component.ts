@@ -18,7 +18,7 @@ export class RandomWordComponent {
 
   fetchRandomWord(): void {
     this.loading = true;
-    this.http.get<{ word: string }>(`${environment.apiBaseUrl}/api/random-word`).subscribe({
+    this.http.get<{ word: string }>(`${environment.apiBaseUrl}/random-word`).subscribe({
       next: (res) => {
         this.word = res.word;
         this.loading = false;
