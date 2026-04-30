@@ -145,27 +145,17 @@ jobs:
 
           # ── Tests section ──────────────────────────────────────────────────
           if [ "$PASSED" = "true" ]; then
-            TEST_SECTION="Result : PASSED
-
-          +------------+-------+
-          | Metric     | Value |
-          +------------+-------+
-          | Statements | ${{ needs.test.outputs.statements }} |
-          | Branches   | ${{ needs.test.outputs.branches }} |
-          | Functions  | ${{ needs.test.outputs.functions }} |
-          | Lines      | ${{ needs.test.outputs.lines }} |
-          +------------+-------+"
+            TEST_SECTION="Result     : PASSED
+          Statements : ${{ needs.test.outputs.statements }}
+          Branches   : ${{ needs.test.outputs.branches }}
+          Functions  : ${{ needs.test.outputs.functions }}
+          Lines      : ${{ needs.test.outputs.lines }}"
           elif [ "$FAIL_TYPE" = "coverage" ]; then
-            TEST_SECTION="Result : FAILED (coverage thresholds not met)
-
-          +------------+-------+
-          | Metric     | Value |
-          +------------+-------+
-          | Statements | ${{ needs.test.outputs.statements }} |
-          | Branches   | ${{ needs.test.outputs.branches }} |
-          | Functions  | ${{ needs.test.outputs.functions }} |
-          | Lines      | ${{ needs.test.outputs.lines }} |
-          +------------+-------+
+            TEST_SECTION="Result     : FAILED (coverage thresholds not met)
+          Statements : ${{ needs.test.outputs.statements }}
+          Branches   : ${{ needs.test.outputs.branches }}
+          Functions  : ${{ needs.test.outputs.functions }}
+          Lines      : ${{ needs.test.outputs.lines }}
 
           Threshold violations:
           ${{ needs.test.outputs.failure_detail }}"
@@ -179,38 +169,22 @@ jobs:
           # ── Deploy section ─────────────────────────────────────────────────
           DEPLOY_RESULT="${{ needs.deploy.result }}"
           if [ "$PASSED" != "true" ]; then
-            DEPLOY_SECTION="+--------+----------------------------+
-          | Field  | Value                      |
-          +--------+----------------------------+
-          | Result | SKIPPED (tests did not pass) |
-          +--------+----------------------------+"
+            DEPLOY_SECTION="Result : SKIPPED (tests did not pass)"
           elif [ "$DEPLOY_RESULT" = "success" ]; then
-            DEPLOY_SECTION="+--------+----------------------------+
-          | Field  | Value                      |
-          +--------+----------------------------+
-          | Result | SUCCESS                    |
-          | URL    | https://3dprinter.jrebollo.dev |
-          +--------+----------------------------+"
+            DEPLOY_SECTION="Result : SUCCESS
+          URL    : https://3dprinter.jrebollo.dev"
           else
-            DEPLOY_SECTION="+--------+----------------------------+
-          | Field  | Value                      |
-          +--------+----------------------------+
-          | Result | FAILED                     |
-          +--------+----------------------------+"
+            DEPLOY_SECTION="Result : FAILED"
           fi
 
           {
             echo "content<<EOF"
             echo "PrintLab — Deployment Report"
             echo "============================"
-            echo "+---------+------------------------------------------------+"
-            echo "| Field   | Value                                          |"
-            echo "+---------+------------------------------------------------+"
-            printf "| %-7s | %-46s |\n" "Commit"  "${{ github.sha }}"
-            printf "| %-7s | %-46s |\n" "Message" "${{ github.event.head_commit.message }}"
-            printf "| %-7s | %-46s |\n" "Branch"  "${{ github.ref_name }}"
-            printf "| %-7s | %-46s |\n" "By"      "${{ github.actor }}"
-            echo "+---------+------------------------------------------------+"
+            echo "Commit  : ${{ github.sha }}"
+            echo "Message : ${{ github.event.head_commit.message }}"
+            echo "Branch  : ${{ github.ref_name }}"
+            echo "By      : ${{ github.actor }}"
             echo ""
             echo "UNIT TESTS"
             echo "----------"
