@@ -18,8 +18,11 @@ Angular single-page application for a 3D printing portfolio site. Features a dar
 - **Owner page** — profile picture, name, city, and Instagram link
 - **Projects page** — card grid with click-to-open detail modal
 - Dark theme with CSS custom properties
+- Mobile responsive — hamburger drawer menu, fluid grid, centered modals
 - SOLID architecture: smart/dumb component separation, core services layer
 - Environment-based API URL (dev vs production)
+- Unit tests with Jasmine/Karma — 100% coverage, 85% minimum threshold enforced
+- CI/CD pipeline via GitHub Actions — tests gate every deployment, email report on every push
 
 ## Project Structure
 
@@ -96,6 +99,64 @@ npm run build
 
 The output is in `dist/`. Serve the contents of that folder with any static hosting provider (Vercel, Netlify, etc.).
 
+## Testing
+
+Unit tests use **Jasmine + Karma** and are co-located with each source file (`*.spec.ts`).
+
+```bash
+# Run once (headless)
+npm test -- --watch=false --browsers=ChromeHeadless
+
+# Watch mode during development
+npm test
+```
+
+Coverage is collected automatically on every run. A **minimum of 85%** across all metrics
+(statements, branches, functions, lines) is enforced — the run fails if any metric drops below.
+
+### Build + test together (CI mode)
+
+```bash
+npm run build:ci
+```
+
+This runs the full test suite first and only proceeds to `ng build` if all tests pass and
+coverage thresholds are met. This is the command used by the CI/CD pipeline.
+
+## CI/CD Pipeline
+
+Deployments are managed by **GitHub Actions** (`.github/workflows/deploy.yml`).
+
+### Flow on every push to `main`
+
+```
+push to main
+  └─ run unit tests + collect coverage
+       ├─ FAIL → deployment skipped
+       └─ PASS → deploy to Vercel (production)
+            └─ always → send email report
+```
+
+### Email report
+
+An email is sent to the address in the `NOTIFY_EMAIL` secret after every push. It contains:
+
+- Whether tests **passed** or **failed**
+- If failed: whether the cause is a **coverage threshold violation** (with the specific metrics)
+  or a **spec failure** (with the failing test names and error messages)
+- Whether the deployment **succeeded**, **failed**, or was **skipped**
+
+### Required GitHub Secrets
+
+| Secret | Description |
+|---|---|
+| `VERCEL_TOKEN` | Vercel personal access token |
+| `VERCEL_ORG_ID` | Found in `.vercel/project.json` after running `npx vercel link` |
+| `VERCEL_PROJECT_ID` | Found in `.vercel/project.json` after running `npx vercel link` |
+| `NOTIFY_EMAIL` | Recipient address for deployment reports |
+| `MAIL_USERNAME` | Gmail address used to send the report |
+| `MAIL_PASSWORD` | Gmail App Password (16-char, generated in Google Account → Security → App passwords) |
+
 ## Routing
 
 | Path | Component |
@@ -107,11 +168,14 @@ The output is in `dist/`. Serve the contents of that folder with any static host
 
 ## Deployment (Vercel)
 
+Deployments are triggered automatically by GitHub Actions on every push to `main` (see CI/CD Pipeline above). Manual deploys are also possible:
+
 1. Push this folder to a GitHub repository.
-2. Import the project in [Vercel](https://vercel.com).
-3. Set the **Build Command** to `npm run build` and the **Output Directory** to `dist/fe/browser`.
-4. Update `src/environments/environment.prod.ts` with your Railway backend URL before the first deploy.
-5. To use a custom domain, add it in Vercel → Project → Settings → Domains and point your DNS accordingly.
+2. Run `npx vercel link` inside this folder to connect it to your Vercel project.
+3. Add the required secrets to the GitHub repository (see CI/CD Pipeline → Required GitHub Secrets).
+4. Push to `main` — the pipeline handles testing and deploying.
+
+> The `vercel.json` file configures the build command (`ng build`) and SPA routing rewrites.
 
 ## Custom Domain
 

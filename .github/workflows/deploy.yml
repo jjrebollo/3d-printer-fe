@@ -172,7 +172,7 @@ jobs:
             DEPLOY_SECTION="Result : SKIPPED (tests did not pass)"
           elif [ "$DEPLOY_RESULT" = "success" ]; then
             DEPLOY_SECTION="Result : SUCCESS
-          URL    : https://jrebollo.dev"
+          URL    : https://3dprinter.jrebollo.dev"
           else
             DEPLOY_SECTION="Result : FAILED"
           fi
