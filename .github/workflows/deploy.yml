@@ -1,0 +1,216 @@
+name: Test, Deploy & Notify
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  # ── 1. Run unit tests ────────────────────────────────────────────────────────
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    outputs:
+      passed:        ${{ steps.result.outputs.passed }}
+      failure_type:  ${{ steps.failure.outputs.type }}
+      failure_detail: ${{ steps.failure.outputs.detail }}
+      statements:    ${{ steps.coverage.outputs.statements }}
+      branches:      ${{ steps.coverage.outputs.branches }}
+      functions:     ${{ steps.coverage.outputs.functions }}
+      lines:         ${{ steps.coverage.outputs.lines }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        id: tests
+        continue-on-error: true
+        run: |
+          set +e
+          npx ng test --watch=false --browsers=ChromeHeadless 2>&1 | tee /tmp/test-output.txt
+          exit ${PIPESTATUS[0]}
+
+      - name: Extract coverage metrics
+        id: coverage
+        run: |
+          extract() {
+            local val
+            val=$(grep "$1" /tmp/test-output.txt 2>/dev/null | grep -oP '\d+(?:\.\d+)?(?=%)' | head -1)
+            echo "${val:-N/A}%"
+          }
+          echo "statements=$(extract Statements)" >> $GITHUB_OUTPUT
+          echo "branches=$(extract Branches)"     >> $GITHUB_OUTPUT
+          echo "functions=$(extract Functions)"   >> $GITHUB_OUTPUT
+          echo "lines=$(extract Lines)"           >> $GITHUB_OUTPUT
+
+      - name: Classify failure and extract details
+        id: failure
+        if: steps.tests.outcome == 'failure'
+        run: |
+          OUTPUT=/tmp/test-output.txt
+
+          # Check for coverage threshold violations first
+          if grep -qiE "does not meet global threshold|coverage threshold" "$OUTPUT"; then
+            echo "type=coverage" >> $GITHUB_OUTPUT
+
+            detail=$(grep -iE "does not meet global threshold|coverage threshold" "$OUTPUT" \
+              | sed 's/^[[:space:]]*//' \
+              | head -10 \
+              | awk '{print NR". "$0}')
+
+            {
+              echo "detail<<EOF"
+              echo "$detail"
+              echo "EOF"
+            } >> $GITHUB_OUTPUT
+
+          # Otherwise it's one or more failing specs
+          else
+            echo "type=spec" >> $GITHUB_OUTPUT
+
+            # Jasmine prints failures as:
+            #   X) DescribeName > it description
+            #      Error: ...
+            # Grab those blocks from the output
+            detail=$(awk '
+              /^[[:space:]]*[0-9]+\)/ { capture=1; block=$0; next }
+              capture && /^[[:space:]]*[0-9]+\)/ { print block; block=$0; next }
+              capture && /^[[:space:]]*$/ && block !~ /^$/ { print block; print ""; block=""; capture=0; next }
+              capture { block=block"\n"$0 }
+              END { if (block!="") print block }
+            ' "$OUTPUT" | head -80)
+
+            # Fallback if awk captured nothing: grab lines after "FAILED"
+            if [ -z "$detail" ]; then
+              detail=$(grep -A 5 "FAILED" "$OUTPUT" | head -40)
+            fi
+
+            {
+              echo "detail<<EOF"
+              echo "$detail"
+              echo "EOF"
+            } >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set passed flag
+        id: result
+        run: |
+          if [ "${{ steps.tests.outcome }}" = "success" ]; then
+            echo "passed=true"  >> $GITHUB_OUTPUT
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+          fi
+
+  # ── 2. Deploy to Vercel (only if tests passed) ───────────────────────────────
+  deploy:
+    name: Deploy to Vercel
+    needs: test
+    if: needs.test.outputs.passed == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ steps.deploy.outcome }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Vercel
+        id: deploy
+        continue-on-error: true
+        env:
+          VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: npx vercel@latest --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
+
+  # ── 3. Send email (always, even if previous jobs failed or were skipped) ─────
+  notify:
+    name: Email Notification
+    needs: [test, deploy]
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Build email body
+        id: body
+        run: |
+          PASSED="${{ needs.test.outputs.passed }}"
+          FAIL_TYPE="${{ needs.test.outputs.failure_type }}"
+
+          # ── Tests section ──────────────────────────────────────────────────
+          if [ "$PASSED" = "true" ]; then
+            TEST_SECTION="Result     : PASSED
+          Statements : ${{ needs.test.outputs.statements }}
+          Branches   : ${{ needs.test.outputs.branches }}
+          Functions  : ${{ needs.test.outputs.functions }}
+          Lines      : ${{ needs.test.outputs.lines }}"
+          elif [ "$FAIL_TYPE" = "coverage" ]; then
+            TEST_SECTION="Result     : FAILED (coverage thresholds not met)
+          Statements : ${{ needs.test.outputs.statements }}
+          Branches   : ${{ needs.test.outputs.branches }}
+          Functions  : ${{ needs.test.outputs.functions }}
+          Lines      : ${{ needs.test.outputs.lines }}
+
+          Threshold violations:
+          ${{ needs.test.outputs.failure_detail }}"
+          else
+            TEST_SECTION="Result     : FAILED (spec failure)
+
+          Failing test(s):
+          ${{ needs.test.outputs.failure_detail }}"
+          fi
+
+          # ── Deploy section ─────────────────────────────────────────────────
+          DEPLOY_RESULT="${{ needs.deploy.result }}"
+          if [ "$PASSED" != "true" ]; then
+            DEPLOY_SECTION="Result : SKIPPED (tests did not pass)"
+          elif [ "$DEPLOY_RESULT" = "success" ]; then
+            DEPLOY_SECTION="Result : SUCCESS
+          URL    : https://jrebollo.dev"
+          else
+            DEPLOY_SECTION="Result : FAILED"
+          fi
+
+          {
+            echo "content<<EOF"
+            echo "PrintLab — Deployment Report"
+            echo "============================"
+            echo "Commit : ${{ github.sha }}"
+            echo "Branch : ${{ github.ref_name }}"
+            echo "By     : ${{ github.actor }}"
+            echo ""
+            echo "UNIT TESTS"
+            echo "----------"
+            echo "$TEST_SECTION"
+            echo ""
+            echo "DEPLOYMENT"
+            echo "----------"
+            echo "$DEPLOY_SECTION"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      - name: Send deployment report
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          secure: false
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: >-
+            ${{ needs.test.outputs.passed == 'true' && needs.deploy.result == 'success'
+              && 'PrintLab Deploy — Success'
+              || needs.test.outputs.failure_type == 'coverage'
+              && 'PrintLab Deploy — Failed (coverage)'
+              || needs.test.outputs.passed != 'true'
+              && 'PrintLab Deploy — Failed (tests)'
+              || 'PrintLab Deploy — Failed (deploy)' }}
+          to:   ${{ secrets.NOTIFY_EMAIL }}
+          from: GitHub Actions <${{ secrets.MAIL_USERNAME }}>
+          body: ${{ steps.body.outputs.content }}

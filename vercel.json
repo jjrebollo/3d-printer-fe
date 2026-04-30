@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build:ci",
+  "buildCommand": "ng build",
   "rewrites": [
     { "source": "/3dprinter/(.*)", "destination": "/index.html" }
   ]
