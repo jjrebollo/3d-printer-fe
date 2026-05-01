@@ -55,7 +55,7 @@ jobs:
         if: steps.tests.outcome == 'success'
         uses: codecov/codecov-action@v5
         with:
-          files: ./coverage/3dprinter/lcov.info
+          files: ./coverage/fe/lcov.info
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Classify failure and extract details
