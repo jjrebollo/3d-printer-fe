@@ -1,5 +1,12 @@
 # 3D Printing Portfolio — Frontend
 
+[![CI](https://github.com/jjrebollo/3d-printer-fe/actions/workflows/deploy.yml/badge.svg)](https://github.com/jjrebollo/3d-printer-fe/actions/workflows/deploy.yml)
+[![codecov](https://codecov.io/gh/jjrebollo/3d-printer-fe/graph/badge.svg?token=CODECOV_TOKEN)](https://codecov.io/gh/jjrebollo/3d-printer-fe)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Angular](https://img.shields.io/badge/Angular-17-DD0031?logo=angular&logoColor=white)](https://angular.dev)
+[![Node](https://img.shields.io/badge/node-%3E%3D18-339933?logo=node.js&logoColor=white)](https://nodejs.org)
+[![Vercel](https://img.shields.io/badge/deployed-Vercel-000000?logo=vercel&logoColor=white)](https://3dprinter.jrebollo.dev)
+
 Angular single-page application for a 3D printing portfolio site. Features a dark-themed landing page, owner profile, and a project gallery with detail modals.
 
 ## Tech Stack
