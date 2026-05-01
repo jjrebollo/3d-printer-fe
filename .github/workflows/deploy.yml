@@ -19,9 +19,9 @@ jobs:
       lines:         ${{ steps.coverage.outputs.lines }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 18
           cache: 'npm'
@@ -119,7 +119,7 @@ jobs:
       status: ${{ steps.deploy.outcome }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Deploy to Vercel
         id: deploy
@@ -197,7 +197,7 @@ jobs:
           } >> $GITHUB_OUTPUT
 
       - name: Send deployment report
-        uses: dawidd6/action-send-mail@v3
+        uses: dawidd6/action-send-mail@v17
         with:
           server_address: smtp.gmail.com
           server_port: 587
